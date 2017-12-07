@@ -2,7 +2,7 @@
 
 ## Alternative Firmware für die Geräte Sonoff Dual und HVIO
 
-### Hinweis: Die Modifizierung des Sonoff (wenn auch nur softwareseitig) erfolgt auf eigene Gefahr! Während der Arbeiten/des Flash-Vorgangs am geöffneten Gerät darf keine Netzspannung (230V) anliegen!
+### Hinweis: Die Modifizierung des Sonoff (wenn auch nur softwareseitig) erfolgt auf eigene Gefahr! Generell ist während der Arbeiten/des Flash-Vorgangs am geöffneten Gerät keine Netzspannung (230V) anzulegen!
 
 Für Informationen zur Einrichtung etc., bitte das [Wiki](https://github.com/jp112sdl/SonoffDualHVIOHMLOX/wiki) benutzen.
 
