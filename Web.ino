@@ -53,7 +53,7 @@ void initWebserver() {
 }
 
 void webSetRelay() {
-  bool _transmitstate = NO_TRANSMITSTATE;
+  bool _transmitstate = TRANSMITSTATE;
   byte _relaynum = 0;
   byte _relaystate = RELAYSTATE_OFF;
   if (WebServer.args() > 0) {
