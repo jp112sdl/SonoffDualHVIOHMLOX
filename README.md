@@ -4,8 +4,7 @@
 
 ### Hinweis: Die Modifizierung des Sonoff (wenn auch nur softwareseitig) erfolgt auf eigene Gefahr! Generell ist während der Arbeiten/des Flash-Vorgangs am geöffneten Gerät keine Netzspannung (230V) anzulegen!
 
-<img src="https://luani.de/content/uploads/2016/04/ESPIO-Beitrag-768x767.jpg" width=300>
-<img src="http://sonoff.itead.cc/images/dual2.jpg" width=300>
+<img src="https://luani.de/content/uploads/2016/04/ESPIO-Beitrag-768x767.jpg" width=300><img src="http://sonoff.itead.cc/images/dual2.jpg" width=300>
 
 Für Informationen zur Einrichtung etc., bitte das [Wiki](https://github.com/jp112sdl/SonoffDualHVIOHMLOX/wiki) benutzen.
 
