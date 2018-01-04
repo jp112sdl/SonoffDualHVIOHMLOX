@@ -22,7 +22,7 @@
 #include "js_fwupd.h"
 #include "html_defaultHtml.h"
 
-const String FIRMWARE_VERSION = "1.0";
+const String FIRMWARE_VERSION = "1.1.0";
 //#define                       UDPDEBUG
 
 #define LEDPinDual            13
@@ -32,6 +32,18 @@ const String FIRMWARE_VERSION = "1.0";
 #define Relay2PinHVIO          5
 #define Switch1PinHVIO        12
 #define Switch2PinHVIO        13
+
+//Dual R2:
+#define Relay1PinDualR2       12
+#define Relay2PinDualR2        5
+#define Switch1PinDualR2       0
+#define Switch2PinDualR2       9
+#define SwitchPinHeadDualR2   10
+
+byte Switch1 = 0;
+byte Switch2 = 0;
+byte Relay1 = 0;
+byte Relay2 = 0;
 
 #define MillisKeyBounce      150
 #define ConfigPortalTimeout  180  //Timeout (Sekunden) des AccessPoint-Modus
@@ -57,7 +69,8 @@ enum BackendTypes_e {
 
 enum Model_e {
   Model_Dual,
-  Model_HVIO
+  Model_HVIO,
+  Model_DualR2
 };
 
 enum RelayStates_e {
@@ -138,7 +151,8 @@ void setup() {
   Serial.println("\nSonoffDual / HVIO " + WiFi.macAddress() + " startet...");
   pinMode(LEDPinDual, OUTPUT);
   pinMode(LEDPinHVIO, OUTPUT);
-  pinMode(Switch1PinHVIO, INPUT_PULLUP);
+  pinMode(Switch2PinHVIO, INPUT_PULLUP);
+  pinMode(SwitchPinHeadDualR2, INPUT_PULLUP);
 
   Serial.println(F("Config-Modus durch bootConfigMode aktivieren? "));
   if (SPIFFS.begin()) {
@@ -159,7 +173,7 @@ void setup() {
     Serial.println(F("Config-Modus mit Taster aktivieren?"));
     Serial.flush();
     for (int i = 0; i < 20; i++) {
-      if (digitalRead(Switch1PinHVIO) == LOW || ButtonPressed()) {
+      if (digitalRead(SwitchPinHeadDualR2) == LOW || digitalRead(Switch2PinHVIO) == LOW || ButtonPressed()) {
         startWifiManager = true;
         break;
       }
@@ -193,23 +207,37 @@ void setup() {
       pinMode(Relay2PinHVIO, OUTPUT);
       pinMode(Switch1PinHVIO, INPUT_PULLUP);
       pinMode(Switch2PinHVIO, INPUT_PULLUP);
+      Switch1 = Switch1PinHVIO;
+      Switch2 = Switch2PinHVIO;
+      Relay1 = Relay1PinHVIO;
+      Relay2 = Relay2PinHVIO;
       break;
+    case Model_DualR2:
+      DEBUG("\nModell = HVIO");
+      LEDPin = LEDPinDual;
+      pinMode(Relay1PinDualR2, OUTPUT);
+      pinMode(Relay2PinDualR2, OUTPUT);
+      pinMode(Switch1PinDualR2, INPUT_PULLUP);
+      pinMode(Switch2PinDualR2, INPUT_PULLUP);
+      pinMode(SwitchPinHeadDualR2, INPUT_PULLUP);
+      Switch1 = Switch1PinDualR2;
+      Switch2 = Switch2PinDualR2;
+      Relay1 = Relay1PinDualR2;
+      Relay2 = Relay2PinDualR2;
   }
   pinMode(LEDPin, OUTPUT);
 
   initWebserver();
 
-  if (!MDNS.begin(GlobalConfig.Hostname.c_str())) {
-    DEBUG("Error setting up MDNS responder!");
-  }
   if (GlobalConfig.BackendType == BackendType_HomeMatic) {
-    HomeMaticConfig.Channel1Name =  "CUxD." + getStateCUxD(String(GlobalConfig.DeviceName) + ":1", "Address");
-    HomeMaticConfig.Channel2Name =  "CUxD." + getStateCUxD(String(GlobalConfig.DeviceName) + ":2", "Address");
-    DEBUG("HomeMaticConfig.Channel1Name =  " + HomeMaticConfig.Channel1Name);
-    DEBUG("HomeMaticConfig.Channel2Name =  " + HomeMaticConfig.Channel2Name);
+    reloadCUxDAddress(NO_TRANSMITSTATE);
   }
 
   startOTAhandling();
+  
+  if (!MDNS.begin(GlobalConfig.Hostname.c_str())) {
+    DEBUG("Error setting up MDNS responder!");
+  }
 
   DEBUG("Starte UDP-Handler an Port " + String(UDPPORT) + "...");
   UDPClient.UDP.begin(UDPPORT);
@@ -230,18 +258,20 @@ void loop() {
     WebServer.handleClient();
 
     //Tasterbedienung Taster abarbeiten
-    if (digitalRead(Switch1PinHVIO) == LOW || digitalRead(Switch2PinHVIO) == LOW) {
-      if (!KeyPress) {
-        if (digitalRead(Switch1PinHVIO) == LOW) switchRelay(1, RELAYSTATE_TOGGLE, TRANSMITSTATE);
-        if (digitalRead(Switch2PinHVIO) == LOW) switchRelay(2, RELAYSTATE_TOGGLE, TRANSMITSTATE);
-        KeyPress = true;
+    if (GlobalConfig.Model == Model_HVIO || GlobalConfig.Model == Model_DualR2) {
+      if (digitalRead(Switch1) == LOW || digitalRead(Switch2) == LOW) {
+        if (!KeyPress) {
+          if (digitalRead(Switch1) == LOW) switchRelay(1, RELAYSTATE_TOGGLE, TRANSMITSTATE);
+          if (digitalRead(Switch2) == LOW) switchRelay(2, RELAYSTATE_TOGGLE, TRANSMITSTATE);
+          KeyPress = true;
+        }
+      } else {
+        KeyPress = false;
       }
-    } else {
-      KeyPress = false;
     }
-
-    delay(10);
   }
+
+  delay(10);
 }
 
 void switchRelay(byte RelayNum, byte toState, bool transmitState) {
@@ -274,8 +304,12 @@ void switchRelay(byte RelayNum, byte toState, bool transmitState) {
       switch_dual_relay(sum);
       break;
     case Model_HVIO:
-      digitalWrite(Relay1PinHVIO, Relay1State);
-      digitalWrite(Relay2PinHVIO, Relay2State);
+      digitalWrite(Relay1, Relay1State);
+      digitalWrite(Relay2, Relay2State);
+      break;
+    case Model_DualR2:
+      digitalWrite(Relay1, Relay1State);
+      digitalWrite(Relay2, Relay2State);
       break;
   }
 
@@ -295,9 +329,9 @@ void blinkLED(int count) {
   byte oldState = digitalRead(LEDPin);
   delay(100);
   for (int i = 0; i < count; i++) {
-    digitalWrite(LEDPin,!oldState);
+    digitalWrite(LEDPin, !oldState);
     delay(100);
-    digitalWrite(LEDPin,oldState);
+    digitalWrite(LEDPin, oldState);
     delay(100);
   }
   delay(200);

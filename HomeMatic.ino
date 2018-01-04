@@ -23,20 +23,22 @@ bool setStateCUxD(String id, String value) {
       payload = payload.substring(payload.indexOf("<ret>"));
       payload = payload.substring(5, payload.indexOf("</ret>"));
 
-
       DEBUG("result: " + payload, "setStateCUxD()", (payload != "null") ? _slInformational : _slError);
 
       return (payload != "null");
 
     } else {
-      if (!doWifiConnect())
-        ESP.restart();
+      DEBUG("setStateCUxD: WiFi.status() != WL_CONNECTED, trying to reconnect with doWifiConnect()", "setStateCUxD()", _slError);
+      /*if (!doWifiConnect()) {
+        DEBUG("setStateCUxD: doWifiConnect() failed.", "setStateCUxD()", _slError);
+        //ESP.restart();
+        }*/
     }
   } else return true;
 }
 
 String getStateCUxD(String id, String type) {
-  if (id.indexOf(".null.") == -1 && String(GlobalConfig.ccuIP) != "0.0.0.0") {
+  if (id != "" && id.indexOf(".null.") == -1 && String(GlobalConfig.ccuIP) != "0.0.0.0") {
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
       http.setTimeout(HTTPTimeOut);
@@ -61,9 +63,25 @@ String getStateCUxD(String id, String type) {
 
       return payload;
     } else {
-      if (!doWifiConnect())
-        ESP.restart();
+      DEBUG("getStateCUxD: WiFi.status() != WL_CONNECTED, trying to reconnect with doWifiConnect()", "getStateCUxD()", _slError);
+      /*if (!doWifiConnect()) {
+        DEBUG("getStateCUxD: doWifiConnect() failed.", "getStateCUxD()", _slError);
+        //ESP.restart();
+        }*/
     }
-  } else return "";
+  } else return "null";
+}
+
+String reloadCUxDAddress(bool transmitState) {
+  HomeMaticConfig.Channel1Name =  "CUxD." + getStateCUxD(String(GlobalConfig.DeviceName) + ":1", "Address");
+  HomeMaticConfig.Channel2Name =  "CUxD." + getStateCUxD(String(GlobalConfig.DeviceName) + ":2", "Address");
+
+  DEBUG("HomeMaticConfig.Channel1Name = " + HomeMaticConfig.Channel1Name);
+  DEBUG("HomeMaticConfig.Channel2Name = " + HomeMaticConfig.Channel2Name);
+
+  if (transmitState == TRANSMITSTATE)
+    setStateCUxD(HomeMaticConfig.Channel1Name + ".SET_STATE", String(Relay1State));
+
+  return "CUxD Address 1 = " + HomeMaticConfig.Channel1Name + "; CUxD Address 2 = " + HomeMaticConfig.Channel2Name;
 }
 

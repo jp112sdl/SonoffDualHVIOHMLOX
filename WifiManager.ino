@@ -15,7 +15,6 @@ bool doWifiConnect() {
 
   if (!startWifiManager && _ssid != "" && _psk != "" ) {
     DEBUG(F("Connecting WLAN the classic way..."));
-    WiFi.disconnect();
     WiFi.mode(WIFI_STA);
     WiFi.hostname(GlobalConfig.Hostname);
     WiFi.begin(_ssid.c_str(), _psk.c_str());
@@ -38,6 +37,7 @@ bool doWifiConnect() {
   } else {
     WiFiManager wifiManager;
     wifiManager.setDebugOutput(wifiManagerDebugOutput);
+    pinMode(LEDPinDual, OUTPUT);
     digitalWrite(LEDPinDual, LOW);
     digitalWrite(LEDPinHVIO, LOW);
     wifiManager.setAPCallback(configModeCallback);
@@ -65,13 +65,16 @@ bool doWifiConnect() {
     String model = "";
     switch (GlobalConfig.Model) {
       case Model_Dual:
-        model = F("<option selected value='0'>Sonoff Dual</option><option value='1'>HVIO</option>");
+        model = F("<option selected value='0'>Sonoff Dual</option><option value='1'>HVIO</option><option value='2'>Sonoff Dual R2</option>");
         break;
       case Model_HVIO:
-        model = F("<option value='0'>Sonoff Dual</option><option selected value='1'>HVIO</option>");
+        model = F("<option value='0'>Sonoff Dual</option><option selected value='1'>HVIO</option><option value='2'>Sonoff Dual R2</option>");
+        break;
+      case Model_DualR2:
+        model = F("<option value='0'>Sonoff Dual</option><option value='1'>HVIO</option><option selected value='2'>Sonoff Dual R2</option>");
         break;
       default:
-        model = F("<option selected value='0'>Sonoff Dual</option><option value='1'>HVIO</option>");
+        model = F("<option selected value='0'>Sonoff Dual</option><option value='1'>HVIO</option><option value='2'>Sonoff Dual R2</option>");
         break;
     }
     WiFiManagerParameter custom_model("model", "Modell", "", 8, 2, model.c_str());

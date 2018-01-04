@@ -11,6 +11,6 @@ void DEBUG(String DebugMessage, String Tag, byte Severity) {
   }
 #endif
 
-  if (GlobalConfig.Model == Model_HVIO)
+  if (GlobalConfig.Model != Model_Dual)
     Serial.println(DebugMessage);
 }

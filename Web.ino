@@ -9,6 +9,7 @@ const char HTTP_STATUSLABEL[] PROGMEM = "<div class='l c'>{sl}</div>";
 const char HTTP_NEWFW_BUTTON[] PROGMEM = "<div><input class='fwbtn' id='fwbtn' type='button' value='Neue Firmware verf&uuml;gbar' onclick=\"window.open('{fwurl}')\" /></div><div><input class='fwbtn' id='fwbtnupdt' type='button' value='Firmwaredatei einspielen' onclick=\"window.location.href='/update'\" /></div>";
 
 void initWebserver() {
+  DEBUG("initWebServer()...");
   WebServer.on("/set", webSetRelay);
   WebServer.on("/10", []() {
     sendDefaultWebCmdReply();
@@ -44,12 +45,17 @@ void initWebserver() {
     WebServer.send(200, "text/plain", "rebooting");
     ESP.restart();
   });
+  WebServer.on("/reloadCUxD", []() {
+    String ret = reloadCUxDAddress(TRANSMITSTATE);
+    WebServer.send(200, "text/plain", ret);
+  });
   WebServer.on("/version", versionHtml);
   WebServer.on("/firmware", versionHtml);
   WebServer.on("/config", configHtml);
   httpUpdater.setup(&WebServer);
   WebServer.onNotFound(defaultHtml);
   WebServer.begin();
+  DEBUG("initWebServer()... DONE");
 }
 
 void webSetRelay() {
