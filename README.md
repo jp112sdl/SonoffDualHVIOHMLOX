@@ -1,6 +1,6 @@
 # SonoffDualHVIOHMLOX
 
-## Alternative Firmware für die Geräte Sonoff Dual (nicht R2!) und [HVIO](https://luani.de/projekte/esp8266-hvio/)
+## Alternative Firmware für die Geräte Sonoff Dual (auch R2) und [HVIO](https://luani.de/projekte/esp8266-hvio/)
 
 ### Hinweis: Die Modifizierung des Sonoff (wenn auch nur softwareseitig) erfolgt auf eigene Gefahr! Generell ist während der Arbeiten/des Flash-Vorgangs am geöffneten Gerät keine Netzspannung (230V) anzulegen!
 
