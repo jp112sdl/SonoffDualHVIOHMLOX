@@ -22,7 +22,7 @@
 #include "js_fwupd.h"
 #include "html_defaultHtml.h"
 
-const String FIRMWARE_VERSION = "1.1.0";
+const String FIRMWARE_VERSION = "1.1.1";
 //#define                       UDPDEBUG
 
 #define LEDPinDual            13
