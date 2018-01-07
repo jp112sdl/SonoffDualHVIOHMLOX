@@ -6,7 +6,6 @@ const char HTTP_SAVE_BUTTON[] PROGMEM = "<div><button name='btnSave' value='1' t
 const char HTTP_CONF[] PROGMEM = "<div><label>{st}:</label></div><div><input type='text' id='ccuip' name='ccuip' pattern='((^|\\.)((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){4}$' maxlength=16 placeholder='{st}' value='{ccuip}'></div><div><label>Ger&auml;tename:</label></div><div><input type='text' id='devicename' name='devicename' pattern='[A-Za-z0-9_ -]+' placeholder='Ger&auml;tename' value='{dn}'></div>";
 const char HTTP_CONF_LOX[] PROGMEM = "<div><label>UDP Port:</label></div><div><input type='text' id='lox_udpport' pattern='[0-9]{1,5}' maxlength='5' name='lox_udpport' placeholder='UDP Port' value='{udp}'></div>";
 const char HTTP_STATUSLABEL[] PROGMEM = "<div class='l c'>{sl}</div>";
-const char HTTP_NEWFW_BUTTON[] PROGMEM = "<div><input class='fwbtn' id='fwbtn' type='button' value='Neue Firmware verf&uuml;gbar' onclick=\"window.open('{fwurl}')\" /></div><div><input class='fwbtn' id='fwbtnupdt' type='button' value='Firmwaredatei einspielen' onclick=\"window.location.href='/update'\" /></div>";
 
 void initWebserver() {
   DEBUG("initWebServer()...");
@@ -107,6 +106,7 @@ void defaultHtml() {
   page.replace("{v}", GlobalConfig.DeviceName);
   page.replace("{ls1}", ((Relay1State == On) ? "AN" : "AUS"));
   page.replace("{ls2}", ((Relay2State == On) ? "AN" : "AUS"));
+
   String fwurl = FPSTR(GITHUB_REPO_URL);
   String fwjsurl = FPSTR(GITHUB_REPO_URL);
   fwurl.replace("api.", "");
