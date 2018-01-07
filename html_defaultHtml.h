@@ -42,7 +42,7 @@ const char HTTP_DEFAULTHTML[] PROGMEM = R"=====(
       <label>Firmware: {fw}</label>
     </div>
     <div>
-      <input class='fwbtn' id='fwbtn' type='button' value='Neue Firmware verf&uuml;gbar' onclick="window.open('{fwjsurl}')" />
+      <input class='fwbtn' id='fwbtn' type='button' value='Neue Firmware verf&uuml;gbar' onclick="window.open('{fwurl}')" />
     </div>
     <div>
       <input class='fwbtn' id='fwbtnupdt' type='button' value='Firmwaredatei einspielen' onclick="window.location.href='/update'" />
