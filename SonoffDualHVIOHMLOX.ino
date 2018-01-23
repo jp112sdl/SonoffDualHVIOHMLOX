@@ -148,7 +148,7 @@ struct udp_t {
 void setup() {
   Serial.begin(19200);
   switch_dual_relay(0);
-  Serial.println("\nSonoffDual / HVIO " + WiFi.macAddress() + " startet...");
+  Serial.println("\nSonoffDual (R2) / HVIO " + WiFi.macAddress() + " startet...");
   pinMode(LEDPinDual, OUTPUT);
   pinMode(LEDPinHVIO, OUTPUT);
   pinMode(Switch2PinHVIO, INPUT_PULLUP);
