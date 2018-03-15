@@ -17,6 +17,7 @@ bool doWifiConnect() {
     DEBUG(F("Connecting WLAN the classic way..."));
     WiFi.mode(WIFI_STA);
     WiFi.hostname(GlobalConfig.Hostname);
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.begin(_ssid.c_str(), _psk.c_str());
     int waitCounter = 0;
     if (String(NetConfig.ip) != "0.0.0.0")
