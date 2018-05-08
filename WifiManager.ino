@@ -18,22 +18,30 @@ bool doWifiConnect() {
     WiFi.mode(WIFI_STA);
     WiFi.hostname(GlobalConfig.Hostname);
     WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    WiFi.setAutoReconnect(true);
+    if (String(NetConfig.ip) != "0.0.0.0") {
+      WiFi.config(IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]), IPAddress(gwBytes[0], gwBytes[1], gwBytes[2], gwBytes[3]), IPAddress(netmaskBytes[0], netmaskBytes[1], netmaskBytes[2], netmaskBytes[3]));
+      ETS_UART_INTR_DISABLE();
+      wifi_station_disconnect();
+      ETS_UART_INTR_ENABLE();
+    }
     WiFi.begin(_ssid.c_str(), _psk.c_str());
     int waitCounter = 0;
-    if (String(NetConfig.ip) != "0.0.0.0")
-      WiFi.config(IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]), IPAddress(gwBytes[0], gwBytes[1], gwBytes[2], gwBytes[3]), IPAddress(netmaskBytes[0], netmaskBytes[1], netmaskBytes[2], netmaskBytes[3]));
 
     while (WiFi.status() != WL_CONNECTED) {
       waitCounter++;
       Serial.print(".");
       digitalWrite(LEDPinHVIO, (!(digitalRead(LEDPinHVIO))));
       digitalWrite(LEDPinDual, (!(digitalRead(LEDPinDual))));
-      if (waitCounter == 20) {
+
+      if (waitCounter == 30) {
         return false;
       }
       delay(500);
     }
+
     DEBUG("Wifi Connected");
+    WiFiConnected = true;
     return true;
   } else {
     WiFiManager wifiManager;

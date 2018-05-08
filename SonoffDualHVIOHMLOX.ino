@@ -22,7 +22,7 @@
 #include "js_fwupd.h"
 #include "html_defaultHtml.h"
 
-const String FIRMWARE_VERSION = "1.1.2";
+const String FIRMWARE_VERSION = "1.1.3";
 //#define                       UDPDEBUG
 
 #define LEDPinDual            13
@@ -130,8 +130,10 @@ bool Relay1State = Off;
 bool Relay2State = Off;
 unsigned long LastMillisKeyPress = 0;
 unsigned long KeyPressDownMillis = 0;
+unsigned long LastWiFiReconnectMillis = 0;
 bool OTAStart = false;
 bool UDPReady = false;
+bool WiFiConnected = false;
 bool newFirmwareAvailable = false;
 bool startWifiManager = false;
 bool wm_shouldSaveConfig        = false;
@@ -234,7 +236,7 @@ void setup() {
   }
 
   startOTAhandling();
-  
+
   if (!MDNS.begin(GlobalConfig.Hostname.c_str())) {
     DEBUG("Error setting up MDNS responder!");
   }
@@ -246,6 +248,28 @@ void setup() {
 }
 
 void loop() {
+  if (LastMillisKeyPress > millis())
+    LastMillisKeyPress = millis();
+  if (KeyPressDownMillis > millis())
+    KeyPressDownMillis = millis();
+  if (LastWiFiReconnectMillis > millis())
+    LastWiFiReconnectMillis = millis();
+
+  //Reconnect WiFi wenn nicht verbunden (alle 30 Sekunden)
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFiConnected = false;
+    if (millis() - LastWiFiReconnectMillis > 30000) {
+      LastWiFiReconnectMillis = millis();
+      DEBUG("WiFi Connection lost! Reconnecting...");
+      WiFi.reconnect();
+    }
+  } else {
+    if (!WiFiConnected) {
+      DEBUG("WiFi reconnected!");
+      WiFiConnected = true;
+    }
+  }
+
   //auf OTA Anforderung reagieren
   ArduinoOTA.handle();
 

@@ -26,7 +26,7 @@ extern "C" {
 
 const char HTTP_HEAD[] PROGMEM            = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/><title>{v}</title>";
 const char HTTP_HEAD_END[] PROGMEM        = "</head><body><div style='text-align:left;display:inline-block;min-width:260px;'>";
-const char HTTP_PORTAL_OPTIONS[] PROGMEM  = "<form action=\"/wifi\" method=\"get\"><button>DualSwitch konfigurieren</button></form><br/><br/><form action=\"/i\" method=\"get\"><button>Chip-Info</button></form><br/><form action=\"/r\" method=\"post\"><button>Reset</button></form>";
+const char HTTP_PORTAL_OPTIONS[] PROGMEM  = "<form action=\"/wifi\" method=\"get\"><button>Sonoff konfigurieren</button></form><br/><br/><form action=\"/i\" method=\"get\"><button>Chip-Info</button></form><br/><form action=\"/r\" method=\"post\"><button>Restart</button></form><br><form action=\"/c\" method=\"post\"><button>Factory Reset</button></form>";
 const char HTTP_ITEM[] PROGMEM            = "<div><a href='#p' onclick='c(this)'>{v}</a>&nbsp;<span class='q {i}'>{r}%</span></div>";
 const char HTTP_FORM_START[] PROGMEM      = "<form method='get' action='wifisave'><div><input type='text' id='s' name='s' length=32 placeholder='SSID'></div><div><input id='p' name='p' length=64 type='password' placeholder='WLAN-Key'></div>";
 const char HTTP_FORM_PARAM_INPUT[] PROGMEM= "<div id='div_{i}'><input type='text' id='{i}' name='{n}' length={l} placeholder='{p}' value='{v}' {c}></div>";
@@ -39,7 +39,7 @@ const char HTTP_SCAN_LINK[] PROGMEM       = "<br/><div class=\"c\"><a href=\"/wi
 const char HTTP_SAVED[] PROGMEM           = "<div>Daten gespeichert!<br/>Die WLAN-Netzwerkverbindung wird hergestellt...<br/><br/>Sollte keine Verbindung zustandekommen, bitte nochmals mit dem AP verbinden!</div>";
 const char HTTP_END[] PROGMEM             = "</div><script>setBackendType();</script></body></html>";
 
-#define WIFI_MANAGER_MAX_PARAMS 15
+#define WIFI_MANAGER_MAX_PARAMS 20
 
 class WiFiManagerParameter {
   public:
@@ -78,7 +78,7 @@ class WiFiManager
 
     //if you want to always start the config portal, without trying to connect first
     boolean       startConfigPortal();
-    boolean       startConfigPortal(char const *apName, char const *apPassword = NULL);
+    boolean       startConfigPortal(char const *apName);
 
     // get the AP name of the config portal, so it can be used in the callback
     String        getConfigPortalSSID();
@@ -98,8 +98,6 @@ class WiFiManager
     void          setDebugOutput(boolean debug);
     //defaults to not showing anything under 8% signal quality if called
     void          setMinimumSignalQuality(int quality = 8);
-    //sets a custom ip /gateway /subnet configuration
-    void          setAPStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn);
     //sets config for a static IP
     void          setSTAStaticIPConfig(IPAddress ip, IPAddress gw, IPAddress sn);
     //called when AP mode and config portal is started
@@ -137,9 +135,6 @@ class WiFiManager
     unsigned long _connectTimeout         = 0;
     unsigned long _configPortalStart      = 0;
 
-    IPAddress     _ap_static_ip;
-    IPAddress     _ap_static_gw;
-    IPAddress     _ap_static_sn;
     IPAddress     _sta_static_ip;
     IPAddress     _sta_static_gw;
     IPAddress     _sta_static_sn;
@@ -164,6 +159,7 @@ class WiFiManager
     void          handleWifiSave();
     void          handleInfo();
     void          handleReset();
+    void          handleClearAllData();
     void          handleNotFound();
     void          handle204();
     boolean       captivePortal();
