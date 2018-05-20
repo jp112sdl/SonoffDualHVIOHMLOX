@@ -215,7 +215,7 @@ void setup() {
       Relay2 = Relay2PinHVIO;
       break;
     case Model_DualR2:
-      DEBUG("\nModell = HVIO");
+      DEBUG("\nModell = DualR2");
       LEDPin = LEDPinDual;
       pinMode(Relay1PinDualR2, OUTPUT);
       pinMode(Relay2PinDualR2, OUTPUT);

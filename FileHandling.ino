@@ -25,7 +25,7 @@ bool loadSystemConfig() {
         DynamicJsonBuffer jsonBuffer;
         JsonObject& json = jsonBuffer.parseObject(buf.get());
         DEBUG("Content of JSON Config-File: /" + configJsonFile, "loadSystemConfig()", _slInformational);
-        if (GlobalConfig.Model == Model_HVIO) {
+        if (GlobalConfig.Model != Model_Dual) {
           json.printTo(Serial);
           Serial.println();
         }
@@ -83,7 +83,7 @@ bool saveSystemConfig() {
     return false;
   }
 
-  if (GlobalConfig.Model == Model_HVIO) {
+  if (GlobalConfig.Model != Model_Dual) {
     json.printTo(Serial);
     Serial.println();
   }
