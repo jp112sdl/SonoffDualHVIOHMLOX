@@ -1,4 +1,4 @@
-# SonoffDualHVIOHMLOX
+# SonoffDualHVIOHMLOX - DISCONTINUED -
 
 ## Alternative Firmware für die Geräte Sonoff Dual (auch R2) und [HVIO](https://luani.de/projekte/esp8266-hvio/)
 
